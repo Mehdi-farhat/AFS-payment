@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paiement Sécurisé | Atlas Financial Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#000000;
+  --surface:#0a0a0a;
+  --surface2:#111111;
+  --card:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+  --border-hover:rgba(0,185,148,0.5);
+  --green:#00b894;
+  --green2:#00d4a8;
+  --gold:#f5d000;
+  --red:#ff0a1f;
+  --text:#f0f0f0;
+  --muted:#9aa5b1;
+  --mono:#00d4a8;
+  --r:14px;
+  --glow:0 0 40px rgba(0,185,148,0.12);
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* ─── BG TEXTURE ──────────────────────────── */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-layer::before{content:'';position:absolute;inset:0;background-image:radial-gradient(ellipse 70% 50% at 20% 20%,rgba(0,185,148,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 80% 80%,rgba(245,208,0,0.04) 0%,transparent 60%);pointer-events:none}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:48px 48px}
+.scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,185,148,0.3),transparent);animation:scan 8s linear infinite;pointer-events:none}
+@keyframes scan{0%{top:-2px}100%{top:100%}}
+
+/* ─── LAYOUT ──────────────────────────────── */
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 24px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,185,148,0.2),transparent);margin:0}
+
+/* ─── NAV ─────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-img{height:36px;width:36px;object-fit:contain;border-radius:6px}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:-.3px;color:var(--text)}
+.brand-name span{color:var(--green)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.secure-badge{display:flex;align-items:center;gap:6px;font-size:11px;padding:5px 14px;border-radius:99px;border:1px solid rgba(0,185,148,0.25);color:var(--green);background:rgba(0,185,148,0.06)}
+.secure-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--text)}
+
+/* ─── HERO ────────────────────────────────── */
+.hero{padding:80px 0 70px;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);background:rgba(0,185,148,0.07);border:1px solid rgba(0,185,148,0.2);padding:6px 18px;border-radius:99px;margin-bottom:30px;animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(38px,6vw,64px);line-height:1.05;letter-spacing:-2px;margin-bottom:20px;animation:fadeUp .6s .1s ease both}
+h1 .accent{color:var(--green)}
+h1 .gold{color:var(--gold)}
+.hero-sub{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 44px;font-weight:300;animation:fadeUp .6s .2s ease both}
+.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;animation:fadeUp .6s .3s ease both}
+.stat-item{text-align:center}
+.stat-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text)}
+.stat-n.g{color:var(--green)}
+.stat-l{font-size:12px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+
+/* ─── GLASS CARD ──────────────────────────── */
+.g-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:border-color .3s,box-shadow .3s,transform .3s}
+.g-card:hover{border-color:rgba(0,185,148,0.3);box-shadow:var(--glow);transform:translateY(-2px)}
+
+/* ─── SECTION ─────────────────────────────── */
+section{padding:64px 0}
+.sec-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--green)}
+.sec-title{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:-.5px;margin-bottom:10px}
+.sec-sub{color:var(--muted);font-size:14px;max-width:520px}
+.sec-head{margin-bottom:44px}
+
+/* ─── METHOD TABS ─────────────────────────── */
+.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
+@media(max-width:640px){.method-grid{grid-template-columns:1fr}}
+.method-tab{padding:26px 22px;cursor:pointer;position:relative;overflow:hidden}
+.method-tab.active{border-color:rgba(0,185,148,0.5);background:rgba(0,185,148,0.06)}
+.method-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.m-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px}
+.m-icon.green{background:rgba(0,185,148,0.1);border:1px solid rgba(0,185,148,0.2)}
+.m-icon.gold{background:rgba(245,208,0,0.1);border:1px solid rgba(245,208,0,0.2)}
+.m-icon.gray{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)}
+.m-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px}
+.m-desc{font-size:12px;color:var(--muted)}
+.m-badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:99px;margin-top:10px;letter-spacing:.05em;text-transform:uppercase}
+.m-badge.on{background:rgba(0,185,148,0.1);color:var(--green);border:1px solid rgba(0,185,148,0.25)}
+.m-badge.soon{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid rgba(255,255,255,0.08)}
+
+/* ─── PAY CARDS ───────────────────────────── */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:680px){.pay-grid{grid-template-columns:1fr}}
+.pay-card{padding:30px}
+.pay-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.pay-card-title{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:17px}
+.pay-card-logo-img{height:28px;object-fit:contain;border-radius:4px}
+.bank-logo{font-size:11px;padding:4px 10px;border-radius:6px;letter-spacing:.05em;background:rgba(0,185,148,0.1);color:var(--green);border:1px solid rgba(0,185,148,0.2);font-family:'DM Mono',monospace}
+.pay-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.pay-val{font-size:14px;font-weight:500;color:var(--text);margin-bottom:16px}
+.copy-block{background:rgba(0,185,148,0.04);border:1px solid rgba(0,185,148,0.15);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;transition:border-color .2s}
+.copy-block:hover{border-color:rgba(0,185,148,0.35)}
+.copy-val{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.04em;color:var(--mono);word-break:break-all}
+.copy-btn{flex-shrink:0;margin-left:12px;font-size:11px;padding:5px 14px;border-radius:6px;background:rgba(0,185,148,0.1);border:1px solid rgba(0,185,148,0.3);color:var(--green);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.copy-btn:hover{background:rgba(0,185,148,0.2)}
+.copy-btn.copied{color:#00d97e;border-color:rgba(0,217,126,0.3);background:rgba(0,217,126,0.06)}
+.ref-note{font-size:12px;color:var(--gold);background:rgba(245,208,0,0.06);border:1px solid rgba(245,208,0,0.15);border-radius:8px;padding:8px 12px;margin-top:4px}
+.step-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.step-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
+.step-row span.n{color:var(--green);font-weight:700;font-family:'DM Mono',monospace;font-size:12px;margin-top:1px}
+
+/* ─── STEPS PROCESS ───────────────────────── */
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:680px){.steps-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.steps-grid{grid-template-columns:1fr}}
+.step-card{padding:26px 20px;position:relative}
+.step-num{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;line-height:1;margin-bottom:14px;color:transparent;-webkit-text-stroke:1px rgba(0,185,148,0.4)}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.step-arrow{position:absolute;top:34px;right:-10px;font-size:16px;color:rgba(0,185,148,0.3);z-index:2}
+
+/* ─── FORM ─────────────────────────────────── */
+.form-wrap{padding:36px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s,background .2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green);background:rgba(0,185,148,0.04)}
+.fg select option{background:#111}
+.upload-zone{border:1.5px dashed rgba(0,185,148,0.2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;grid-column:1/-1}
+.upload-zone:hover{border-color:rgba(0,185,148,0.5);background:rgba(0,185,148,0.03)}
+.upload-ico{font-size:32px;margin-bottom:10px;opacity:.5}
+.upload-text{font-size:13px;color:var(--muted)}
+.upload-text strong{color:var(--green)}
+.btn-submit{width:100%;padding:18px;border-radius:12px;background:linear-gradient(135deg,var(--green),#006d5b);border:none;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;cursor:pointer;letter-spacing:.02em;transition:opacity .2s,transform .2s,box-shadow .2s;margin-top:10px}
+.btn-submit:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,185,148,0.3)}
+.form-note{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.form-note span{color:var(--green)}
+
+/* ─── TRUST ─────────────────────────────────── */
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:680px){.trust-grid{grid-template-columns:1fr 1fr}}
+.trust-card{padding:24px 18px}
+.trust-ico{font-size:22px;margin-bottom:10px}
+.trust-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:6px}
+.trust-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ─── FOOTER ─────────────────────────────────── */
+footer{padding:36px 0;border-top:1px solid var(--border);background:rgba(0,0,0,0.5)}
+.footer-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-logo{height:28px;width:28px;object-fit:contain;border-radius:4px}
+.footer-text{font-size:13px;color:var(--muted)}
+.footer-text strong{color:var(--green)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--green)}
+
+/* ─── TICKER ─────────────────────────────────── */
+.ticker-bar{background:rgba(0,185,148,0.06);border-bottom:1px solid rgba(0,185,148,0.12);padding:8px 0;font-size:11px;color:var(--green);overflow:hidden;white-space:nowrap}
+.ticker-inner{display:inline-flex;gap:64px;animation:ticker 30s linear infinite}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.t-item{display:inline-flex;align-items:center;gap:6px}
+.t-item::before{content:'◆';font-size:7px;opacity:.5}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"><div class="grid-lines"></div><div class="scan-line"></div></div>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-inner">
+    <span class="t-item">EUR/USD 1.0842 ▲</span>
+    <span class="t-item">GBP/USD 1.2715 ▲</span>
+    <span class="t-item">USD/MAD 10.02 ▼</span>
+    <span class="t-item">EUR/MAD 10.87 ▲</span>
+    <span class="t-item">XAU/USD 2 341.20 ▲</span>
+    <span class="t-item">COPY-TRADING MAM ACTIF</span>
+    <span class="t-item">PAIEMENT 100% SÉCURISÉ</span>
+    <span class="t-item">EUR/USD 1.0842 ▲</span>
+    <span class="t-item">GBP/USD 1.2715 ▲</span>
+    <span class="t-item">USD/MAD 10.02 ▼</span>
+    <span class="t-item">EUR/MAD 10.87 ▲</span>
+    <span class="t-item">XAU/USD 2 341.20 ▲</span>
+    <span class="t-item">COPY-TRADING MAM ACTIF</span>
+    <span class="t-item">PAIEMENT 100% SÉCURISÉ</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <img class="logo-img" src="data:image/webp;base64,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" alt="AFS Logo">
+      <span class="brand-name">ATLAS <span>FINANCIAL</span></span>
+    </div>
+    <div class="nav-right">
+      <a href="https://atlas-financial-services.com" class="nav-link">← Retour au site</a>
+      <div class="secure-badge">🔒 Paiement sécurisé</div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Portail de paiement officiel</div>
+  <h1>Réglez votre<br><span class="accent">Abonnement</span> <span class="gold">AFS</span></h1>
+  <p class="hero-sub">Choisissez votre méthode, effectuez le règlement avec les coordonnées exactes ci-dessous, puis soumettez votre preuve. Traitement sous 24h.</p>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-n g">100%</div><div class="stat-l">Sécurisé</div></div>
+    <div class="stat-item"><div class="stat-n">24h</div><div class="stat-l">Traitement</div></div>
+    <div class="stat-item"><div class="stat-n g">+500</div><div class="stat-l">Clients actifs</div></div>
+    <div class="stat-item"><div class="stat-n">3</div><div class="stat-l">Étapes</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- MÉTHODES -->
+<section>
+  <div class="sec-head">
+    <div class="sec-label">Étape 1</div>
+    <div class="sec-title">Choisissez votre méthode</div>
+    <div class="sec-sub">Deux méthodes disponibles au Maroc. Paiements en ligne bientôt disponibles.</div>
+  </div>
+  <div class="method-grid">
+    <div class="g-card method-tab active" onclick="selectMethod(this)">
+      <div class="m-icon green">🏦</div>
+      <div class="m-name">Virement Bancaire</div>
+      <div class="m-desc">CIH Bank — Virement depuis toute banque marocaine</div>
+      <span class="m-badge on">Disponible</span>
+    </div>
+    <div class="g-card method-tab" onclick="selectMethod(this)">
+      <div class="m-icon gold">💸</div>
+      <div class="m-name">CashPlus</div>
+      <div class="m-desc">Transfert instantané en agence ou via l'application</div>
+      <span class="m-badge on">Disponible</span>
+    </div>
+    <div class="g-card method-tab" onclick="selectMethod(this)">
+      <div class="m-icon gray">💳</div>
+      <div class="m-name">Carte & Digital</div>
+      <div class="m-desc">Stripe · PayPal · Apple Pay · CMI Maroc</div>
+      <span class="m-badge soon">Bientôt</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COORDONNÉES -->
+<section>
+  <div class="sec-head">
+    <div class="sec-label">Étape 2</div>
+    <div class="sec-title">Coordonnées de paiement</div>
+    <div class="sec-sub">Utilisez exactement ces informations. Copiez les numéros pour éviter toute erreur.</div>
+  </div>
+  <div class="pay-grid">
+
+    <!-- BANK -->
+    <div class="g-card pay-card">
+      <div class="pay-card-header">
+        <div class="pay-card-title">🏦 Virement CIH Bank</div>
+        <span class="bank-logo">CIH BANK</span>
+      </div>
+
+      <div class="pay-lbl">Bénéficiaire</div>
+      <div class="pay-val">ATLAS FINANCIAL SERVICES</div>
+
+      <div class="pay-lbl">RIB Complet</div>
+      <div class="copy-block">
+        <span class="copy-val" id="rib">230 480 3688212211009100 97</span>
+        <button class="copy-btn" onclick="copyIt('rib',this)">Copier</button>
+      </div>
+
+      <div class="pay-lbl">IBAN</div>
+      <div class="copy-block">
+        <span class="copy-val" id="iban">MA64 2304 8036 8821 2211 0091 0097</span>
+        <button class="copy-btn" onclick="copyIt('iban',this)">Copier</button>
+      </div>
+
+      <div class="pay-lbl">Code SWIFT / BIC</div>
+      <div class="copy-block">
+        <span class="copy-val" id="swift">CIHMMAMC</span>
+        <button class="copy-btn" onclick="copyIt('swift',this)">Copier</button>
+      </div>
+
+      <div class="pay-lbl">Banque</div>
+      <div class="pay-val">CIH Bank — Maroc</div>
+
+      <div class="ref-note">⚡ Référence obligatoire : votre nom complet + service souscrit</div>
+    </div>
+
+    <!-- CASHPLUS -->
+    <div class="g-card pay-card">
+      <div class="pay-card-header">
+        <div class="pay-card-title">
+          <img class="pay-card-logo-img" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCACoASwDASIAAhEBAxEB/8QAHAABAAIDAQEBAAAAAAAAAAAAAAUGBAcIAwIB/8QAQxAAAQMDAgQDBQQGBgsAAAAAAQACAwQFEQYhBxIxQRNRYRQicYGRCDKhsSNSYnLB0RUzN0J0ghYXNUNTY5LC0uHw/8QAGwEBAAIDAQEAAAAAAAAAAAAAAAMGAQIEBQf/xAAyEQACAQMCAggFAwUAAAAAAAAAAQIDBBEFEiExE0FRYXGh0fAUIoGRwTKx4QYVIyRC/9oADAMBAAIRAxEAPwDstERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBQuptT2nT8YFbMXTvHuQR7vd8uw9ThQXFfXMWk7eympC2S61TSYmncRM6eI4fHYDuc+RWrbLSXPUcss0QdX1gJfJzTNEjvM4cQXdumcbdF1Ubfct8+CPC1HWOhqfD0Fun+38ltunEi81MhbQspqGPO23iP8AmTt+Cx6bU93qHjxrvVc37Lw0fQYUTU6ZvbQfEste13m2Fzh9Qoqopa2jd+mp54v34y3812xpUmsRwVmre3sZbqrl5ryNm2+7XsMD4rz43fkmia4fUYP4qaodWMje2G8QClJOBPGS6I/Hu355HqtPUt1ngIIcdlIS3+SpjEbySfVRSts9R30NacVwk89/Fef4N8Mc17GvY4Oa4ZBByCPNfq1HofVxtNU2kq3k2+R2DnfwSf7w9PMfP47ba5rmhzSHNIyCDkELiq0nTeGWexvqd5DdHmuaP1ERRHaEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAXlW1MFFRz1lTII4II3SyPPRrWjJP0C9VUuL0Vxq9B1lrtLeauuUkVFECSBiSRrXk47BnOT6AraKy0iOtN06cpJZaRzvV3C86/1jU1FDSTVlZVvzHCzfwoxs0E9GtAwMkgZPqtx6D4XVFt8CsvV0c2ojIc2GjcW8h7Zf1PyA+JVl07ZtNcNNHSOfPFTU8DBJW1sow+Z3TJxudzhrRnrgZJ31DrTjvda6d9PpanbbqUHAqJmh87x5gHLW/D3j6hd/SVK3yUlhFRjZWum/7F9LdUfHC9Py+B0WBgYVA4m65p7QXWO3ztNxe0GZzT/UMP/cR08gc9wtMaQ4n3a1Ou9bU11XcLlUwCKl9plL2xOLsl2CcYAGwG2cdlUJ6mepqZameeSWaZ5fJI52XPcTkknucrNKyan8/JGt//AFNGdBKgsSec9y9X5GwGOhmGWO3U1pfSlz1BUFtK1sdOw4kqH/db6DzPp+So/D2gueoNUUlnpJHcsjuaZ/aKJv3nfLoPMkDuupYIrdYrO2NroqSipWbue7AA8yfM+fclSXFZ0vlXM5NG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i855nvPVzj3WcrNp9KpRtoQqvMkuJ411OE60pQ5BERdhAEREAREQBERAEREBq/irZau31n+kNuDhA9wNRybGJ/QP26A9z5/FQ9q19qCla1rqqOqYBjFRHk/UYP1JW5pY2SxuilY17Hgtc1wyHA9QQtY6r4dTQSyVmnh4kRyXUjnYc39wnqPQ/U9FVNU025o1HcWbfHml6dfv6WrTNRta9NW94llcm/2b6vE9qbiPXlv6W3Urz+w9zf5rKi17WzRvcygp4y0Z95xP8lrWo8ShqTBVQzU8zerHsLSPkVJWyrjdBLknPL/NV6etajHg6j+y9D1qmjWajujDzfqbN4hV1TTxUcNPPJEJecvLHcpcBjbI7blU2LoCVOasqxX6cs10Z7zXNcx58nYGfxa5YFlsV1uha5sRhpz/AL2QYbjzHcrOs0697ftUk5ZUWvBpfY8+x6O3tVvaWG8+KbPOgp57jWx0lM3Jcd3dgO5Potm2+ljoqOKmi3bG3GfM9ysax2iltNN4cALpHf1krvvPP8B6KQVr0LRlp8HOpxm/JdnqeDqN98TLbD9K8+8IiKwHmhERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQHhWUdJWxeFWUsNRH+rKwOH4qNGltPNcXMtNMzPUNbgfQbKZRQ1LelVeZxT8UmSwr1aaxCTXgzHpqGjpoGwQU0bImu5mtDdgfMLIRFJGEYLEVgjlJyeWwiItjAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREB//2Q==" alt="CashPlus">
+          CashPlus
+        </div>
+      </div>
+
+      <div class="pay-lbl">Bénéficiaire</div>
+      <div class="pay-val">ATLAS FINANCIAL SERVICES</div>
+
+      <div class="pay-lbl">RIB CashPlus</div>
+      <div class="copy-block">
+        <span class="copy-val" id="cprib">835780030017643458184956</span>
+        <button class="copy-btn" onclick="copyIt('cprib',this)">Copier</button>
+      </div>
+
+      <div class="pay-lbl" style="margin-top:4px">Instructions</div>
+      <div class="step-list">
+        <div class="step-row"><span class="n">01</span><span>Rendez-vous en agence CashPlus ou ouvrez l'application mobile</span></div>
+        <div class="step-row"><span class="n">02</span><span>Choisissez « Transfert d'argent » et saisissez le RIB ci-dessus</span></div>
+        <div class="step-row"><span class="n">03</span><span>Indiquez votre nom + service dans la référence du transfert</span></div>
+        <div class="step-row"><span class="n">04</span><span>Conservez votre reçu pour soumettre la preuve</span></div>
+      </div>
+
+      <div class="ref-note" style="margin-top:16px">⚡ Référence obligatoire : votre nom complet + service souscrit</div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROCESS -->
+<section>
+  <div class="sec-head">
+    <div class="sec-label">Processus</div>
+    <div class="sec-title">Comment ça fonctionne</div>
+    <div class="sec-sub">4 étapes simples pour activer votre accès AFS.</div>
+  </div>
+  <div class="steps-grid">
+    <div class="g-card step-card">
+      <div class="step-num">01</div>
+      <div class="step-title">Choisissez</div>
+      <div class="step-desc">Sélectionnez la méthode adaptée à votre situation</div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="g-card step-card">
+      <div class="step-num">02</div>
+      <div class="step-title">Payez</div>
+      <div class="step-desc">Effectuez le virement avec les coordonnées exactes</div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="g-card step-card">
+      <div class="step-num">03</div>
+      <div class="step-title">Envoyez</div>
+      <div class="step-desc">Soumettez votre reçu via le formulaire ci-dessous</div>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="g-card step-card">
+      <div class="step-num">04</div>
+      <div class="step-title">Activé ✓</div>
+      <div class="step-desc">Confirmation et accès activé sous 24h ouvrables</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FORM -->
+<section>
+  <div class="sec-head">
+    <div class="sec-label">Étape 3</div>
+    <div class="sec-title">Envoyez votre preuve</div>
+    <div class="sec-sub">Complétez ce formulaire immédiatement après votre paiement.</div>
+  </div>
+  <div class="g-card form-wrap">
+    <div class="form-grid">
+      <div class="fg">
+        <label>Nom complet</label>
+        <input type="text" placeholder="Prénom et nom">
+      </div>
+      <div class="fg">
+        <label>Téléphone</label>
+        <input type="tel" placeholder="+212 6XX XXX XXX">
+      </div>
+      <div class="fg">
+        <label>Email</label>
+        <input type="email" placeholder="votre@email.com">
+      </div>
+      <div class="fg">
+        <label>Service souscrit</label>
+        <select>
+          <option value="">Sélectionnez...</option>
+          <option>Copy-Trading — Abonnement Mensuel</option>
+          <option>Copy-Trading — Abonnement Trimestriel</option>
+          <option>Copy-Trading — Abonnement Annuel</option>
+          <option>Le Manuel du Trader</option>
+          <option>Accès Gratuit — Activation</option>
+          <option>Autre service</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Montant payé (MAD)</label>
+        <input type="number" placeholder="Ex : 900">
+      </div>
+      <div class="fg">
+        <label>Méthode utilisée</label>
+        <select>
+          <option value="">Sélectionnez...</option>
+          <option>Virement Bancaire — CIH Bank</option>
+          <option>CashPlus</option>
+        </select>
+      </div>
+      <div class="upload-zone fg full" onclick="document.getElementById('proof').click()">
+        <input type="file" id="proof" style="display:none" accept="image/*,.pdf" onchange="showFile(this)">
+        <div class="upload-ico">📎</div>
+        <div class="upload-text"><strong>Cliquez pour joindre</strong> votre reçu ou capture d'écran</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px" id="file-name">PNG, JPG, PDF — Max 10 MB</div>
+      </div>
+      <div class="fg full">
+        <label>Message (optionnel)</label>
+        <textarea rows="3" placeholder="Précisions sur votre paiement..."></textarea>
+      </div>
+    </div>
+    <button class="btn-submit">Envoyer la preuve de paiement →</button>
+    <p class="form-note"><span>🔒</span> Vos informations sont traitées en toute confidentialité par l'équipe AFS</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TRUST -->
+<section>
+  <div class="sec-head" style="text-align:center">
+    <div class="sec-title">Votre sécurité, notre engagement</div>
+  </div>
+  <div class="trust-grid">
+    <div class="g-card trust-card">
+      <div class="trust-ico">🔒</div>
+      <div class="trust-title">Paiement sécurisé</div>
+      <div class="trust-desc">Chaque transaction est vérifiée manuellement par notre équipe</div>
+    </div>
+    <div class="g-card trust-card">
+      <div class="trust-ico">⚡</div>
+      <div class="trust-title">Confirmation rapide</div>
+      <div class="trust-desc">Accès activé sous 24h ouvrables après confirmation</div>
+    </div>
+    <div class="g-card trust-card">
+      <div class="trust-ico">🛡️</div>
+      <div class="trust-title">Données protégées</div>
+      <div class="trust-desc">Vos informations ne sont jamais partagées avec des tiers</div>
+    </div>
+    <div class="g-card trust-card">
+      <div class="trust-ico">💬</div>
+      <div class="trust-title">Support dédié</div>
+      <div class="trust-desc">Notre équipe est disponible via WhatsApp ou email</div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img class="footer-logo" src="data:image/webp;base64,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" alt="AFS">
+      <span class="footer-text">© 2025 <strong>Atlas Financial Services</strong> — Tous droits réservés</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://atlas-financial-services.com">Accueil</a>
+      <a href="https://atlas-financial-services.com/pages/contact">Contact</a>
+      <a href="https://atlas-financial-services.com/policies/privacy-policy">Confidentialité</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function copyIt(id,btn){
+  const val=document.getElementById(id).textContent.replace(/\s+/g,' ').trim();
+  navigator.clipboard.writeText(val).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=val;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  const orig=btn.textContent;
+  btn.textContent='✓ Copié!';btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied')},2200);
+}
+function selectMethod(el){
+  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function showFile(inp){
+  if(inp.files&&inp.files[0]){
+    document.getElementById('file-name').innerHTML='<strong style="color:var(--green)">✓ '+inp.files[0].name+'</strong>';
+  }
+}
+// Intersection observer for fade-in
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}});
+},{threshold:0.1});
+document.querySelectorAll('.g-card').forEach(c=>{
+  c.style.opacity='0';c.style.transform='translateY(16px)';c.style.transition='opacity .5s ease, transform .5s ease, border-color .3s, box-shadow .3s';
+  obs.observe(c);
+});
+</script>
+</body>
+</html>
